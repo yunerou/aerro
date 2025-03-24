@@ -5,7 +5,7 @@ import "encoding/json"
 type AppError[T ErrorCode] interface {
 	error
 
-	ErrorCode() ErrorCode
+	ErrorCode() T
 	Origin() error
 	Stacktrace() stackTraceT
 

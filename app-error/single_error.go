@@ -8,7 +8,7 @@ import (
 
 type appError[T ErrorCode] struct {
 	origin  error
-	errCode ErrorCode
+	errCode T
 	i18nMsg string
 	*stack
 }
@@ -61,7 +61,7 @@ func (e *appError[T]) As(target interface{}) bool {
 }
 
 // get base error code.
-func (e *appError[T]) ErrorCode() ErrorCode {
+func (e *appError[T]) ErrorCode() T {
 	return e.errCode
 }
 
