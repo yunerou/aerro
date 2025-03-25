@@ -5,19 +5,19 @@ import (
 	"encoding/json"
 )
 
-type detailAppError[T ErrorCode, D any] struct {
+type detailAppError[T ErrorCode] struct {
 	*appError[T]
-	detail D
+	detail any
 }
 
 // add detail info to error.
-func (a Aerro[T, D]) NewWithDetail(
+func (a Aerro[T]) NewWithDetail(
 	ctx context.Context,
 	code T,
 	origin error,
-	detail D,
+	detail any,
 	templateData ...map[string]any) DetailAppError[T] {
-	aErr := &detailAppError[T, D]{
+	aErr := &detailAppError[T]{
 		appError: &appError[T]{
 			origin:  origin,
 			errCode: code,
@@ -39,11 +39,11 @@ func (a Aerro[T, D]) NewWithDetail(
 	return aErr
 }
 
-func (de *detailAppError[T, D]) Detail() any {
+func (de *detailAppError[T]) Detail() any {
 	return de.detail
 }
 
-func (de *detailAppError[T, D]) ToJSON() json.RawMessage {
+func (de *detailAppError[T]) ToJSON() json.RawMessage {
 	type responseError struct {
 		ErrorCode string `json:"err_code"`
 		Message   string `json:"err_msg"`
@@ -60,10 +60,10 @@ func (de *detailAppError[T, D]) ToJSON() json.RawMessage {
 	return jsonB
 }
 
-func (de *detailAppError[T, D]) MarshalJSON() ([]byte, error) {
+func (de *detailAppError[T]) MarshalJSON() ([]byte, error) {
 	return de.ToJSON(), nil
 }
 
-func (de *detailAppError[T, D]) CastToDetail() (out DetailAppError[T], ok bool) {
+func (de *detailAppError[T]) CastToDetail() (out DetailAppError[T], ok bool) {
 	return de, true
 }

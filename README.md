@@ -14,7 +14,7 @@
 - Stacktrace
 - Multi error
 - Detailed error
-
+- support context, that help you inject anything to control your error (enricher log, know exactly where error come from, filter, ...)
 
 ## Make more ultility function
 

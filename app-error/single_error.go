@@ -13,7 +13,7 @@ type appError[T ErrorCode] struct {
 	*stack
 }
 
-func (a Aerro[T, D]) New(
+func (a Aerro[T]) New(
 	ctx context.Context,
 	code T,
 	origin error,

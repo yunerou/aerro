@@ -6,7 +6,7 @@ type ErrorCode interface {
 	error
 }
 
-type Aerro[TCode ErrorCode, TDetail any] struct {
+type Aerro[TCode ErrorCode] struct {
 	// Inject function to create error message. If your context comes with a language key, use it to create an i18n message.
 	BuildErrorMessage func(ctx context.Context,
 		code TCode,

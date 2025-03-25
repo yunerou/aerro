@@ -12,7 +12,7 @@ type multiAppError[T ErrorCode] struct {
 	httpStatusCode *int
 }
 
-func (a Aerro[T, D]) Append(mErr MultiAppError[T], appErrs ...AppError[T]) MultiAppError[T] {
+func (a Aerro[T]) Append(mErr MultiAppError[T], appErrs ...AppError[T]) MultiAppError[T] {
 	if mErr == nil {
 		mErr = &multiAppError[T]{
 			errs: appErrs,
