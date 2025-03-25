@@ -9,11 +9,16 @@ type AppError[T ErrorCode] interface {
 	Origin() error
 	Stacktrace() stackTraceT
 
+	SetTag(key string, value string) AppError[T]
+	GetTag(key string) (string, bool)
+	Tags() map[string]string
+
 	Is(target error) bool
 	As(target interface{}) bool
+	Unwrap() error
+
 	MarshalJSON() ([]byte, error)
 	ToJSON() json.RawMessage
-	Unwrap() error
 	CastToDetail() (out DetailAppError[T], ok bool)
 }
 
@@ -29,7 +34,9 @@ type MultiAppError[T ErrorCode] interface {
 	MarshalJSON() ([]byte, error)
 	ToJSON() json.RawMessage
 
-	Append(e ...AppError[T])
+	SetTag(key string, value string) MultiAppError[T]
+	GetTag(key string) (string, bool)
+	Tags() map[string]string
+
 	Errors() []AppError[T]
-	SetHttpStatusCode(code int)
 }

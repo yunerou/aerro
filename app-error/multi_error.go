@@ -8,8 +8,8 @@ import (
 )
 
 type multiAppError[T ErrorCode] struct {
-	errs           []AppError[T]
-	httpStatusCode *int
+	errs []AppError[T]
+	tags map[string]string
 }
 
 func (a Aerro[T]) Append(mErr MultiAppError[T], appErrs ...AppError[T]) MultiAppError[T] {
@@ -17,14 +17,11 @@ func (a Aerro[T]) Append(mErr MultiAppError[T], appErrs ...AppError[T]) MultiApp
 		mErr = &multiAppError[T]{
 			errs: appErrs,
 		}
-	} else {
-		mErr.Append(appErrs...)
+		return mErr
 	}
-	return mErr
-}
-
-func (me *multiAppError[T]) Append(e ...AppError[T]) {
-	me.errs = append(me.errs, e...)
+	me, _ := mErr.(*multiAppError[T])
+	me.errs = append(me.errs, appErrs...)
+	return me
 }
 
 func (me *multiAppError[T]) Errors() []AppError[T] {
@@ -48,12 +45,6 @@ func (me *multiAppError[T]) Is(target error) bool {
 	return false
 }
 
-// set http status code for multierror when return it to client or use default httpStatusCode
-func (me *multiAppError[T]) SetHttpStatusCode(code int) {
-	tmp := code
-	me.httpStatusCode = &tmp
-}
-
 // make JSON format from error data.
 func (me *multiAppError[T]) ToJSON() json.RawMessage {
 	data := me.errs
@@ -63,4 +54,24 @@ func (me *multiAppError[T]) ToJSON() json.RawMessage {
 
 func (me *multiAppError[T]) MarshalJSON() ([]byte, error) {
 	return me.ToJSON(), nil
+}
+
+func (me *multiAppError[T]) SetTag(key string, value string) MultiAppError[T] {
+	if me.tags == nil {
+		me.tags = make(map[string]string)
+	}
+	me.tags[key] = value
+	return me
+}
+
+func (me *multiAppError[T]) GetTag(key string) (string, bool) {
+	if me.tags == nil {
+		return "", false
+	}
+	value, ok := me.tags[key]
+	return value, ok
+}
+
+func (me *multiAppError[T]) Tags() map[string]string {
+	return me.tags
 }

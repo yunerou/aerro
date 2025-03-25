@@ -10,6 +10,7 @@ type appError[T ErrorCode] struct {
 	origin  error
 	errCode T
 	i18nMsg string
+	tags    map[string]string
 	*stack
 }
 
@@ -68,13 +69,15 @@ func (e *appError[T]) ErrorCode() T {
 // make JSON format from error data.
 func (e *appError[T]) ToJSON() json.RawMessage {
 	type responseError struct {
-		ErrorCode string `json:"error_code"`
-		Message   string `json:"message"`
+		ErrorCode string            `json:"error_code"`
+		Message   string            `json:"message"`
+		Tags      map[string]string `json:"tags,omitempty"`
 	}
 
 	data := responseError{
 		ErrorCode: e.ErrorCode().Error(),
 		Message:   e.Error(),
+		Tags:      e.Tags(),
 	}
 
 	jsonB, _ := json.Marshal(data)
@@ -95,4 +98,24 @@ func (e *appError[T]) Origin() error {
 
 func (e *appError[T]) Stacktrace() stackTraceT {
 	return e.stacktrace()
+}
+
+func (e *appError[T]) SetTag(key string, value string) AppError[T] {
+	if e.tags == nil {
+		e.tags = make(map[string]string)
+	}
+	e.tags[key] = value
+	return e
+}
+
+func (e *appError[T]) GetTag(key string) (string, bool) {
+	if e.tags == nil {
+		return "", false
+	}
+	value, ok := e.tags[key]
+	return value, ok
+}
+
+func (e *appError[T]) Tags() map[string]string {
+	return e.tags
 }
