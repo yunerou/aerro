@@ -12,6 +12,8 @@ type multiAppError[T ErrorCode] struct {
 	tags map[string]string
 }
 
+// Append function is not handle thread-safe.
+// It is the caller's responsibility to ensure that the Append function is called in a thread-safe manner.
 func (a Aerro[T]) Append(mErr MultiAppError[T], appErrs ...AppError[T]) MultiAppError[T] {
 	if mErr == nil {
 		mErr = &multiAppError[T]{
